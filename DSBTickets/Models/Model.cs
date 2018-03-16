@@ -77,11 +77,11 @@ namespace DSBTickets.Models
         //public int id { get; set; }
         public int searchId { get; set; }
         public double lowestPrice { get; set; }
-        //public int numberShifts { get; set; }
+        public int numberShifts { get; set; }
         public DateTime arrivalDate { get; set; }
         public DateTime departureDate { get; set; }
         //public int status { get; set; }
-        //public int journeyTime { get; set; }
+        public int journeyTime { get; set; }
         //public double ticketPrice { get; set; }
         //public double seatReservationPrice { get; set; }
         //public bool isAvailable { get; set; }

@@ -2,13 +2,71 @@
 @using DSBTickets.Models
 
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Søg";
 }
 
 <div class="row">
-    <h1>Billige DSB billetter</h1>
-    @foreach(Journey j in Model)
-    {
-        <p>D: @j.departureDate A: @j.arrivalDate Price: @j.lowestPrice</p>
-    }
+    <h1>Find billige togbilletter</h1>
+    <hr /> 
+    <div>
+        <img id="loading-image" src="~/Content/ajax-loader.gif" style="display: none;" />
+        <span id="loading-text" style="display: none; padding-left: 10px;">Vent venligst..</span>
+    </div>    
+    <div id="ticketsOverview"></div>
+    <form id="form">
+        <div class="form-group">
+            <label for="From">Hvorfra?</label>
+            <input type="text" name="From" class="form-control" placeholder="Aarhus H">
+        </div>
+        <div class="form-group">
+            <label for="To">Hvorhen?</label>
+            <input type="text" name="To" class="form-control" placeholder="København H">
+        </div>
+        <div class="form-group">
+            <label for="Date">Hvornår?</label>
+            <input type="text" name="Date" class="form-control" id="datepicker" placeholder="30-03-2018">
+        </div>
+        <div class="form-group">
+            <input type="button" id="button" value="Søg" class="btn btn-default"/>
+        </div>
+    </form>
 </div>
+
+@section scripts {
+    <script src="~/Scripts/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript">
+        $('#datepicker').datepicker({
+            format: "dd-mm-yyyy",
+            maxViewMode: 2,
+            language: "da",
+            autoclose: true,
+            todayHighlight: true
+        });
+        $(document).ajaxStart(function () {
+            $("#loading-text").text("Vent venligst..");
+            $("#loading-image").show();
+            $("#loading-text").show();
+            setTimeout('$("#loading-text").text("Det tager kun et øjeblik..")', 5000);
+            $("#form").hide();
+            $("#ticketsOverview").hide();
+        });
+
+        $(document).ajaxStop(function () {
+            $("#loading-image").hide();
+            $("#loading-text").hide();
+            $("#form").show();
+            $("#ticketsOverview").show();
+        });
+
+        $("#button").click(function () {
+            $.ajax({
+                url: "/billet/Home/UpdateTickets",
+                type: "GET",
+                data: $("#form").serialize(),
+                success: function (result) {
+                    $("#ticketsOverview").html(result);
+                }
+            });
+        });
+    </script> 
+}

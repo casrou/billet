@@ -8,6 +8,7 @@ using RestSharp;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Net;
+using System.Globalization;
 
 namespace DSBTickets.Controllers
 {
@@ -15,47 +16,18 @@ namespace DSBTickets.Controllers
     {
         public ActionResult Index()
         {
-            List<Journey> result = new List<Journey>();
-            Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId();
-            result.AddRange(t.Item2);
+            //List<Journey> result = new List<Journey>();
+            //Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId("Aarhus H", "København H", "2018-04-1");
+            //result.AddRange(t.Item2);
 
-            if (t.Item3)
-                result.AddRange(getJourneys(t.Item1, t.Item4));
-            result = result.OrderBy(j => j.lowestPrice).ToList();
-            return View(result);
+            //if (t.Item3)
+            //    result.AddRange(getJourneys(t.Item1, t.Item4));
+            //result = result.OrderBy(j => j.lowestPrice).ToList();
+            //return View(result);
+            return View();
         }
 
-        //public static HashSet<Journey> getTickets()
-        //{
-        //    RestClient client = new RestClient("https://www.dsb.dk");
-        //    RestRequest req1 = new RestRequest("api/netbutik/search");
-        //    req1.Method = Method.POST;
-        //    req1.AddParameter("criteria[0][Direction]", 1)
-        //        .AddParameter("criteria[0][DepartLocation]", "Aarhus H")
-        //        .AddParameter("criteria[0][ArriveLocation]", "København H")
-        //        .AddParameter("criteria[0][SearchDate]", "2018-03-14")
-        //        .AddParameter("criteria[0][SearchType]", 7)
-        //        .AddParameter("criteria[0][PassengersAdults]", 1);
-
-        //    HashSet<Journey> journeys = new HashSet<Journey>();
-        //    for (int i = 12; i < 15; i++)
-        //    {
-        //        var c = client.Execute(req1);
-
-        //        var content1 = c.Content;
-
-        //        RootObject root = JsonConvert.DeserializeObject<RootObject>(content1.Substring(1, content1.Length - 2));
-
-        //        Console.WriteLine("TIME: " + i + ":00:00");
-        //        foreach (Journey j in root.journeys)
-        //        {
-        //            journeys.Add(j);
-        //        }
-        //    }
-        //    return journeys;
-        //}
-
-        public static Tuple<int, List<Journey>, bool, CookieContainer> getSearchId()
+        public static Tuple<int, List<Journey>, bool, CookieContainer> getSearchId(string from, string to, string date)
         {
             CookieContainer cc = new CookieContainer();
             RestClient client = new RestClient("https://www.dsb.dk");
@@ -63,15 +35,20 @@ namespace DSBTickets.Controllers
             RestRequest req1 = new RestRequest("api/netbutik/search");
             req1.Method = Method.POST;
             req1.AddParameter("criteria[0][Direction]", 1)
-                .AddParameter("criteria[0][DepartLocation]", "Aarhus H")
-                .AddParameter("criteria[0][ArriveLocation]", "København H")
-                .AddParameter("criteria[0][SearchDate]", "2018-04-1")
+                .AddParameter("criteria[0][DepartLocation]", from)
+                .AddParameter("criteria[0][ArriveLocation]", to)
+                .AddParameter("criteria[0][SearchDate]", date)
                 .AddParameter("criteria[0][SearchType]", 7)
                 .AddParameter("criteria[0][PassengersAdults]", 1)
                 .AddParameter("criteria[0][SearchTime]", "04:00:00");
                         
             var c = client.Execute(req1);
             var content1 = c.Content;
+
+            if (c.StatusCode != HttpStatusCode.OK)
+            {
+                return new Tuple<int, List<Journey>, bool, CookieContainer>(0, null, false, null);
+            }
 
             RootObject root = JsonConvert.DeserializeObject<RootObject>(content1.Substring(1, content1.Length - 2));
                             
@@ -80,6 +57,7 @@ namespace DSBTickets.Controllers
 
         public static List<Journey> getJourneys(int searchId, CookieContainer cc)
         {
+
             RestClient client = new RestClient("https://www.dsb.dk");
             client.CookieContainer = cc;
             RestRequest req1 = new RestRequest("api/netbutik/journeys/"+searchId+"/later");
@@ -105,11 +83,27 @@ namespace DSBTickets.Controllers
             return journeys;
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
+        public ActionResult UpdateTickets(string from, string to, string date)
+        {            
+            List<Journey> result = new List<Journey>();
+            Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId(from, to, ChangeDateTime(date));
+            if(t.Item2 != null) result.AddRange(t.Item2);
 
-            return View();
+            if (t.Item3)
+                result.AddRange(getJourneys(t.Item1, t.Item4));
+            result = result.OrderBy(j => j.lowestPrice).ToList();
+            return View(result);
+        }
+
+        public static string ChangeDateTime(string date)
+        {
+            DateTime dt;
+            DateTime.TryParseExact(date,
+                                   "dd-MM-yyyy",
+                                   CultureInfo.InvariantCulture,
+                                   DateTimeStyles.None,
+                                   out dt);
+            return dt.ToString("yyyy-MM-dd");
         }
 
         public ActionResult Contact()

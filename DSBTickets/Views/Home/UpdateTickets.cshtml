@@ -1,0 +1,28 @@
+﻿@model List<Journey>
+@using DSBTickets.Models
+@{ 
+    Layout = null;
+}
+@if (Model.Count() != 0)
+{
+    <table class="table">
+        <thead><tr><th>Afgang</th><th>Ankomst</th><th>Pris</th><th>Tid</th><th>Skift</th></tr></thead>
+        <tbody>
+            @foreach (Journey j in Model)
+            {
+                <tr><td>@j.departureDate</td><td>@j.arrivalDate</td><td>@j.lowestPrice kr.</td><td>@j.journeyTime min.</td><td>@j.numberShifts</td></tr>
+            }
+        </tbody>
+    </table>
+    <a href="https://www.dsb.dk/" target="_blank" style="padding-left:8px;">Køb billet<img src="~/Content/dsb.png" style="height: 40px; padding-left: 10px;" /></a>
+    <br />
+    <hr />
+}
+else
+{
+    <table class="table">
+        <thead><tr><td>Ingen resultater.. </td></thead>
+    </table>
+    <hr />
+}
+
