@@ -16,14 +16,6 @@ namespace DSBTickets.Controllers
     {
         public ActionResult Index()
         {
-            //List<Journey> result = new List<Journey>();
-            //Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId("Aarhus H", "København H", "2018-04-1");
-            //result.AddRange(t.Item2);
-
-            //if (t.Item3)
-            //    result.AddRange(getJourneys(t.Item1, t.Item4));
-            //result = result.OrderBy(j => j.lowestPrice).ToList();
-            //return View(result);
             return View();
         }
 
@@ -43,16 +35,17 @@ namespace DSBTickets.Controllers
                 .AddParameter("criteria[0][SearchTime]", "04:00:00");
                         
             var c = client.Execute(req1);
-            var content1 = c.Content;
+            var content = c.Content;
 
-            if (c.StatusCode != HttpStatusCode.OK)
+            if (c.StatusCode == HttpStatusCode.OK)
             {
-                return new Tuple<int, List<Journey>, bool, CookieContainer>(0, null, false, null);
+                RootObject root = JsonConvert.DeserializeObject<RootObject>(content.Substring(1, content.Length - 2));
+                if (root.journeys.Count > 0)
+                {
+                    return new Tuple<int, List<Journey>, bool, CookieContainer>(root.journeys[0].searchId, root.journeys, root.canSearchLater, cc);
+                }                
             }
-
-            RootObject root = JsonConvert.DeserializeObject<RootObject>(content1.Substring(1, content1.Length - 2));
-                            
-            return new Tuple<int, List<Journey>, bool, CookieContainer>(root.journeys[0].searchId, root.journeys, root.canSearchLater, cc);
+            return new Tuple<int, List<Journey>, bool, CookieContainer>(0, null, false, null);
         }
 
         public static List<Journey> getJourneys(int searchId, CookieContainer cc)
@@ -69,11 +62,9 @@ namespace DSBTickets.Controllers
             do
             {
             var c = client.Execute(req1);
-
             var content1 = c.Content;
 
             root = JsonConvert.DeserializeObject<RootObject>(content1);
-
             foreach (Journey j in root.journeys)
             {
                 journeys.Add(j);
@@ -86,7 +77,7 @@ namespace DSBTickets.Controllers
         public ActionResult UpdateTickets(string from, string to, string date)
         {            
             List<Journey> result = new List<Journey>();
-            Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId(from, to, ChangeDateTime(date));
+            Tuple<int, List<Journey>, bool, CookieContainer> t = getSearchId(from, to, ChangeDateTimeFormat(date));
             if(t.Item2 != null) result.AddRange(t.Item2);
 
             if (t.Item3)
@@ -95,22 +86,15 @@ namespace DSBTickets.Controllers
             return View(result);
         }
 
-        public static string ChangeDateTime(string date)
+        public static string ChangeDateTimeFormat(string date)
         {
             DateTime dt;
             DateTime.TryParseExact(date,
-                                   "dd-MM-yyyy",
-                                   CultureInfo.InvariantCulture,
-                                   DateTimeStyles.None,
-                                   out dt);
+                                    "dd-MM-yyyy",
+                                    CultureInfo.InvariantCulture,
+                                    DateTimeStyles.None,
+                                    out dt);
             return dt.ToString("yyyy-MM-dd");
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
     }
 }

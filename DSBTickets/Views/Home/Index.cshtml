@@ -1,72 +1,178 @@
 ﻿@model List<Journey>
 @using DSBTickets.Models
+@using DSBTickets.Controllers
 
 @{
     ViewBag.Title = "Søg";
 }
-
-<div class="row">
-    <h1>Find billige togbilletter</h1>
-    <hr /> 
-    <div>
-        <img id="loading-image" src="~/Content/ajax-loader.gif" style="display: none;" />
-        <span id="loading-text" style="display: none; padding-left: 10px;">Vent venligst..</span>
-    </div>    
+<div class="allContent">
+    <div class="loadingContent" style="display: none;">
+        <img id="loading-image" src="~/Content/ajax-loader.gif" />
+        <span id="loading-text" style="padding-left: 10px;">Vent venligst..</span>
+    </div>
     <div id="ticketsOverview"></div>
-    <form id="form">
-        <div class="form-group">
-            <label for="From">Hvorfra?</label>
-            <input type="text" name="From" class="form-control" placeholder="Aarhus H">
-        </div>
-        <div class="form-group">
-            <label for="To">Hvorhen?</label>
-            <input type="text" name="To" class="form-control" placeholder="København H">
-        </div>
-        <div class="form-group">
-            <label for="Date">Hvornår?</label>
-            <input type="text" name="Date" class="form-control" id="datepicker" placeholder="30-03-2018">
-        </div>
-        <div class="form-group">
-            <input type="button" id="button" value="Søg" class="btn btn-default"/>
+    <form id="form" class="form-inline">
+        <div class="form-row">
+            <div class="form-group col-md-4 form-control-lg">
+                <label for="From">Hvorfra?</label>
+                <input type="text" name="From" class="form-control" placeholder="Aarhus H">
+            </div>
+            <div class="form-group col-md-4 form-control-lg">
+                <label for="To">Hvorhen?</label>
+                <input type="text" name="To" class="form-control" placeholder="København H">
+            </div>
+            <div class="form-group col-md-4 form-control-lg">
+                <label for="Date">Hvornår?</label>
+                <input type="text" name="Date" class="form-control" id="datepicker" placeholder="30-03-2018">
+            </div>
+            <input type="button" id="button" value="Søg" class="btn btn-default" style="margin: 15px 0 0 15px;" />
         </div>
     </form>
 </div>
 
 @section scripts {
-    <script src="~/Scripts/js/bootstrap-datepicker.min.js"></script>
-    <script type="text/javascript">
-        $('#datepicker').datepicker({
-            format: "dd-mm-yyyy",
-            maxViewMode: 2,
-            language: "da",
-            autoclose: true,
-            todayHighlight: true
-        });
-        $(document).ajaxStart(function () {
-            $("#loading-text").text("Vent venligst..");
-            $("#loading-image").show();
-            $("#loading-text").show();
-            setTimeout('$("#loading-text").text("Det tager kun et øjeblik..")', 5000);
-            $("#form").hide();
-            $("#ticketsOverview").hide();
-        });
-
-        $(document).ajaxStop(function () {
-            $("#loading-image").hide();
-            $("#loading-text").hide();
-            $("#form").show();
-            $("#ticketsOverview").show();
-        });
-
-        $("#button").click(function () {
-            $.ajax({
-                url: "/billet/Home/UpdateTickets",
-                type: "GET",
-                data: $("#form").serialize(),
-                success: function (result) {
-                    $("#ticketsOverview").html(result);
+<script src="~/Scripts/particles.min.js"></script>
+<script src="~/Scripts/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript">
+    particlesJS("particles-js", {
+        "particles": {
+            "number": {
+                "value": 6,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
                 }
-            });
+            },
+            "color": {
+                "value": "#d2d2d2"
+            },
+            "shape": {
+                "type": "polygon",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000"
+                },
+                "polygon": {
+                    "nb_sides": 6
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": true,
+                "anim": {
+                    "enable": false,
+                    "speed": 1,
+                    "opacity_min": 0.1,
+                    "sync": false
+                }
+            },
+            "size": {
+                "value": 100.21325380409519,
+                "random": false,
+                "anim": {
+                    "enable": true,
+                    "speed": 10,
+                    "size_min": 40,
+                    "sync": false
+                }
+            },
+            "line_linked": {
+                "enable": false,
+                "distance": 200,
+                "color": "#ffffff",
+                "opacity": 1,
+                "width": 2
+            },
+            "move": {
+                "enable": true,
+                "speed": 8,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false,
+                "attract": {
+                    "enable": false,
+                    "rotateX": 600,
+                    "rotateY": 1200
+                }
+            }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": {
+                    "enable": false,
+                    "mode": "bubble"
+                },
+                "onclick": {
+                    "enable": false,
+                    "mode": "remove"
+                },
+                "resize": true
+            },
+            "modes": {
+                "grab": {
+                    "distance": 400,
+                    "line_linked": {
+                        "opacity": 1
+                    }
+                },
+                "bubble": {
+                    "distance": 400,
+                    "size": 40,
+                    "duration": 2,
+                    "opacity": 8,
+                    "speed": 3
+                },
+                "repulse": {
+                    "distance": 200,
+                    "duration": 0.4
+                },
+                "push": {
+                    "particles_nb": 4
+                },
+                "remove": {
+                    "particles_nb": 2
+                }
+            }
+        },
+        "retina_detect": true
+    });
+
+    $('#datepicker').datepicker({
+        format: "dd-mm-yyyy",
+        maxViewMode: 2,
+        language: "da",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ajaxStart(function () {
+        $("#loading-text").text("Vent venligst..");
+        $(".loadingContent").show();
+        setTimeout('$("#loading-text").text("Det tager kun et øjeblik..")', 5000);
+        $("#form").hide();
+        $("#ticketsOverview").hide();
+        $("footer").hide();
+    });
+
+    $(document).ajaxStop(function () {
+        $(".loadingContent").hide();
+        $("#form").show();
+        $("#ticketsOverview").show();
+    });
+
+    $("#button").click(function () {
+        $.ajax({
+            url: "/billet/Home/UpdateTickets", // for subdomain
+            //url: "/Home/UpdateTickets",
+            type: "GET",
+            data: $("#form").serialize(),
+            success: function (result) {
+                $("#ticketsOverview").html(result);
+            }
         });
-    </script> 
+    });
+</script>
 }
