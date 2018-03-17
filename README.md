@@ -1,6 +1,6 @@
 # [Billet](http://crcn.dk/billet)
-![Search](https://github.com/casrou/dsb/blob/master/search.PNG)
+![Search](https://github.com/casrou/billet/blob/master/search.PNG)
 #
-![Loading](https://github.com/casrou/dsb/blob/master/loading.PNG)
+![Loading](https://github.com/casrou/billet/blob/master/loading.PNG)
 #
-![Results](https://github.com/casrou/dsb/blob/master/result.PNG)
+![Results](https://github.com/casrou/billet/dsb/blob/master/result.PNG)
