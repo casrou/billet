@@ -35,7 +35,7 @@ namespace TicketsCore.Controllers
             }
             while (_canSearchLater);
 
-            return _tickets.OrderBy(t => t.lowestPrice);
+            return _tickets.OrderBy(t => t.numberShifts).OrderBy(t => t.journeyTime).OrderBy(t => t.lowestPrice);
         }
 
         private void GetLaterTicketsFromSearchId(int searchId)
@@ -81,77 +81,7 @@ namespace TicketsCore.Controllers
             {
                 _searchId = tickets.Last().journeys.Last().searchId;
             }            
-        }
-
-        //public ActionResult UpdateTickets(string from, string to, string date)
-        //{
-        //    List<Ticket> result = new List<Ticket>();
-        //    Tuple<int, List<Ticket>, bool, CookieContainer> t = getSearchId(from, to, ChangeDateTimeFormat(date));
-        //    if (t.Item2 != null) result.AddRange(t.Item2);
-
-        //    if (t.Item3)
-        //        result.AddRange(getTickets(t.Item1, t.Item4));
-        //    result = result.OrderBy(j => j.lowestPrice).ToList();
-        //    return View(result);
-        //}
-
-        //public static Tuple<int, List<Ticket>, bool, CookieContainer> getSearchId(string from, string to, string date)
-        //{
-        //    CookieContainer cc = new CookieContainer();
-        //    RestClient client = new RestClient("https://www.dsb.dk");
-        //    client.CookieContainer = cc;
-        //    RestRequest req1 = new RestRequest("api/netbutik/search");
-        //    req1.Method = Method.POST;
-        //    //req1.AddParameter("criteria[0][Direction]", 1)
-        //    //    .AddParameter("criteria[0][DepartLocation]", from)
-        //    //    .AddParameter("criteria[0][ArriveLocation]", to)
-        //    //    .AddParameter("criteria[0][SearchDate]", date)
-        //    //    .AddParameter("criteria[0][SearchType]", 7)
-        //    //    .AddParameter("criteria[0][PassengersAdults]", 1)
-        //    //    .AddParameter("criteria[0][SearchTime]", "04:00:00");
-
-        //    req1.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-        //    req1.AddBody("criteria%5B0%5D%5BDirection%5D=1&criteria%5B0%5D%5BDepartLocation%5D=Aarhus+H&criteria%5B0%5D%5BArriveLocation%5D=Hurup+Thy&criteria%5B0%5D%5BSearchDate%5D=2018-08-03T00%3A00%3A00&criteria%5B0%5D%5BSearchTime%5D=18%3A30%3A00&criteria%5B0%5D%5BType%5D=0&criteria%5B0%5D%5BSearchType%5D=7&criteria%5B0%5D%5BSeatReservations%5D=0&criteria%5B0%5D%5BPassengersAdults%5D=1&criteria%5B0%5D%5BPassengersAdultsDiscount%5D=0&criteria%5B0%5D%5BPassengersChildren%5D=0&criteria%5B0%5D%5BPassengersChildrenDiscount%5D=0&criteria%5B0%5D%5BPassengersYoungsters%5D=0&criteria%5B0%5D%5BPassengersYoungstersDiscount%5D=0&criteria%5B0%5D%5BPassengersSeniors%5D=0&criteria%5B0%5D%5BPassengersSeniorsDiscount%5D=0&criteria%5B0%5D%5BPassengersWildcard%5D=0&criteria%5B0%5D%5BPassengersWildcardDiscount%5D=0&criteria%5B0%5D%5BLimitTrainOnly%5D=false&criteria%5B0%5D%5BJourneyId%5D=0");
-
-        //    var c = client.Execute(req1);
-        //    var content = c.Content;
-
-        //    if (c.StatusCode == HttpStatusCode.OK)
-        //    {
-        //        Tickets root = JsonConvert.DeserializeObject<Tickets>(content.Substring(1, content.Length - 2));
-        //        if (root.tickets.Count > 0)
-        //        {
-        //            return new Tuple<int, List<Ticket>, bool, CookieContainer>(root.tickets[0].searchId, root.tickets, root.canSearchLater, cc);
-        //        }
-        //    }
-        //    return new Tuple<int, List<Ticket>, bool, CookieContainer>(0, null, false, null);
-        //}
-
-        //public static List<Ticket> getTickets(int searchId, CookieContainer cc)
-        //{
-
-        //    RestClient client = new RestClient("https://www.dsb.dk");
-        //    client.CookieContainer = cc;
-        //    RestRequest req1 = new RestRequest("api/netbutik/journeys/" + searchId + "/later");
-        //    req1.Method = Method.GET;
-
-        //    List<Ticket> journeys = new List<Ticket>();
-        //    Tickets root;
-
-        //    do
-        //    {
-        //        var c = client.Execute(req1);
-        //        var content1 = c.Content;
-
-        //        root = JsonConvert.DeserializeObject<Tickets>(content1);
-        //        foreach (Ticket j in root.tickets)
-        //        {
-        //            journeys.Add(j);
-        //        }
-        //    } while (root.canSearchLater);
-
-        //    return journeys;
-        //}        
+        }  
 
         public static string ChangeDateTimeFormat(string date)
         {

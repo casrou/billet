@@ -35,10 +35,7 @@ export class Tickets extends Component {
             .then(data => {
                 this.setState({
                     tickets: data,
-                    loading: false,
-                    from: "",
-                    to: "",
-                    date: ""
+                    loading: false
                 });
             });
 
@@ -59,7 +56,7 @@ export class Tickets extends Component {
                             </Moment>
                         </td>
                         <td>{ticket.lowestPrice} kr.</td>
-                        <td>{ticket.journeyTime} min.</td>
+                        <td>{Math.floor(ticket.journeyTime / 60)}:{(ticket.journeyTime % 60)} ({ticket.journeyTime} min.)</td>
                         <td>{ticket.numberShifts}</td>
                     </tr>
                 )}
@@ -74,37 +71,43 @@ export class Tickets extends Component {
 
         return (
             <div>
-                <h1>Tickets</h1>
-                <p>This component demonstrates fetching data from the server.</p>
+                <h1>Togbilletter 🚉</h1>
+                <p>Find nemt de billigste togbilletter på en bestemt dag. Søgningen inkluderer DSB-Orange billetter og sommetider enkelte 'skjulte' billetter.</p>
+                <p>Når du har fundet den perfekte billet:</p>
+                <ul>
+                    <li>Gå til <a href="https://www.dsb.dk/">dsb.dk</a> eller DSB-app'en på din mobil</li>
+                    <li>Søg efter billetten med det præcise tidspunkt for afgang</li>
+                    <li>Køb billetten 🙌</li>
+                </ul>
                 <form className="form-inline" onSubmit={this.handleSearch}>
                     <div className="form-group">
                         <label>
-                        From:
+                        FRA:
                         </label>
                         <input placeholder="Aarhus" type="text" name="from" className="form-control" value={this.state.from} onChange={this.handleChange} />
                     </div>
                     <div className="form-group">
                         <label>
-                        To:
+                        TIL:
                         </label>    
                         <input placeholder="Hurup" type="text" name="to" className="form-control" value={this.state.to} onChange={this.handleChange} />
                     </div>
                     <div className="form-group">
                         <label>
-                        When:
+                        DATO:
                         </label>    
                         <input placeholder="03-08-2018" type="text" name="date" className="form-control" value={this.state.date} onChange={this.handleChange} />
                     </div>
-                    <input className="btn btn-default" type="submit" value="Submit" />
+                    <input className="btn btn-default" type="submit" value="Søg" />
                 </form>
                 <table className='table'>
                     <thead>
                         <tr>
-                            <th>Departure</th>
-                            <th>Arrival</th>
-                            <th>Price</th>
-                            <th>Duration</th>
-                            <th>Changes</th>
+                            <th>Afgang</th>
+                            <th>Ankomst</th>
+                            <th>Pris</th>
+                            <th>Varighed</th>
+                            <th>Skift</th>
                         </tr>
                     </thead>
                     {contents}
