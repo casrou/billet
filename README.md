@@ -1,4 +1,4 @@
-# [Billet](http://crcn.dk/billet)
+# Billet
 ![Search](https://github.com/casrou/billet/blob/master/search.PNG)
 #
 ![Loading](https://github.com/casrou/billet/blob/master/loading.PNG)
